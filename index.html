@@ -171,7 +171,7 @@
     }
     log.forEach(entry => {
       const li = document.createElement('li');
-      li.textContent = ${entry.date} — ${entry.exercise} - ${entry.sets} sets x ${entry.reps} reps @ ${entry.weight} kg;
+      li.textContent = `${entry.date} — ${entry.exercise} - ${entry.sets} sets x ${entry.reps} reps @ ${entry.weight} kg`;
       logList.appendChild(li);
     });
   }
@@ -202,110 +202,7 @@
   }
 
   renderLog();
-<script>
-  const today = new Date().toISOString().split('T')[0];
-  const dateInput = document.getElementById('date');
-  dateInput.value = today;
 
-  const exercisesByDay = {
-    PUSH: [
-      "Benchpress",
-      "Incline benchpress",
-      "Incline benchpress (smith)",
-      "Incline dumbell press",
-      "Tricep extention",
-      "V bar overhead extension",
-      "Single arm tricep extension",
-      "Machine fly",
-      "Cable side raise"
-    ],
-    PULL: [
-      "Deadlift",
-      "Hammer curl",
-      "Preacher curl",
-      "Ez bar curl",
-      "Latt pulldown",
-      "Cable row",
-      "Rear delt extension"
-    ],
-    LEGS: [
-      "Squat",
-      "Hack squat",
-      "Ham curl",
-      "Seated ham curl",
-      "Leg extensions"
-    ]
-  };
-
-  function updateExercises() {
-    const day = document.getElementById('workoutDay').value;
-    const exerciseSelect = document.getElementById('exercise');
-    exerciseSelect.innerHTML = '';
-
-    if (!day) {
-      const option = document.createElement('option');
-      option.text = 'Select workout day first';
-      option.value = '';
-      exerciseSelect.add(option);
-      return;
-    }
-
-    exercisesByDay[day].forEach(exercise => {
-      const option = document.createElement('option');
-      option.text = exercise;
-      option.value = exercise;
-      exerciseSelect.add(option);
-    });
-  }
-
-  let log = JSON.parse(localStorage.getItem('weightliftingLog')) || [];
-
-  function renderLog() {
-    const logList = document.getElementById('log');
-    logList.innerHTML = '';
-
-    if (log.length === 0) {
-      logList.innerHTML = '<li>No entries yet.</li>';
-      return;
-    }
-
-    // Sort by date (newest first)
-    const sortedLog = [...log].sort((a, b) => new Date(b.date) - new Date(a.date));
-
-    sortedLog.forEach(entry => {
-      const li = document.createElement('li');
-      li.textContent = `${entry.date} — ${entry.exercise} - ${entry.sets} sets x ${entry.reps} reps @ ${entry.weight} kg`;
-      logList.appendChild(li);
-    });
-  }
-
-  function addEntry() {
-    // If user didn't change the date, default to today
-    const date = dateInput.value || new Date().toISOString().split('T')[0];
-    const exercise = document.getElementById('exercise').value;
-    const sets = parseInt(document.getElementById('sets').value);
-    const reps = parseInt(document.getElementById('reps').value);
-    const weight = parseFloat(document.getElementById('weight').value);
-
-    if (!exercise || isNaN(sets) || sets <= 0 || isNaN(reps) || reps <= 0 || isNaN(weight) || weight < 0) {
-      alert('Please fill out all fields correctly.');
-      return;
-    }
-
-    log.push({ date, exercise, sets, reps, weight });
-    localStorage.setItem('weightliftingLog', JSON.stringify(log));
-    renderLog();
-
-    // Reset form
-    dateInput.value = today;
-    document.getElementById('workoutDay').value = '';
-    document.getElementById('exercise').innerHTML = '<option value="">Select workout day first</option>';
-    document.getElementById('sets').value = '';
-    document.getElementById('reps').value = '';
-    document.getElementById('weight').value = '';
-  }
-
-  renderLog();
 </script>
 
 </body>
