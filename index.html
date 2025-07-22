@@ -1,109 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="icon.png" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Weightlifting Tracker</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 400px;
-      margin: auto;
-      padding: 20px;
-      background-color: #000;
-      color: #ffdd00;
-      min-height: 100vh;
-    }
-
-    label, select, input, button {
-      display: block;
-      margin: 10px 0 5px;
-      width: 100%;
-      box-sizing: border-box;
-      font-size: 16px;
-    }
-
-    input, select {
-      background-color: #111;
-      border: 1px solid #ffdd00;
-      color: #ffdd00;
-      padding: 8px;
-    }
-
-    button {
-      padding: 10px;
-      cursor: pointer;
-      background-color: #ffdd00;
-      color: #000;
-      font-weight: bold;
-      border: none;
-    }
-
-    ul {
-      padding-left: 20px;
-    }
-
-    li {
-      margin-bottom: 10px;
-    }
-
-    .header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .header img {
-      width: 32px;
-      height: 32px;
-    }
-
-    h2 {
-      margin: 0;
-    }
-  </style>
-</head>
-<body>
-
-<div class="header">
-  <img src="icon.png" alt="App Icon">
-  <h2>Weightlifting Tracker</h2>
-</div>
-
-<label>Date</label>
-<input id="date" type="date" />
-
-<label>Workout Day</label>
-<select id="workoutDay" onchange="updateExercises()">
-  <option value="">Select a day</option>
-  <option value="PUSH">PPL - PUSH</option>
-  <option value="PULL">PPL - PULL</option>
-  <option value="LEGS">PPL - LEGS</option>
-</select>
-
-<label>Exercise</label>
-<select id="exercise">
-  <option value="">Select workout day first</option>
-</select>
-
-<label>Sets</label>
-<input id="sets" type="number" min="1" />
-
-<label>Reps</label>
-<input id="reps" type="number" min="1" />
-
-<label>Weight (kg)</label>
-<input id="weight" type="number" min="0" step="0.1" />
-
-<button onclick="addEntry()">Add Entry</button>
-
-<h3>Your Entries</h3>
-<ul id="log"></ul>
-
 <script>
   const today = new Date().toISOString().split('T')[0];
   const dateInput = document.getElementById('date');
@@ -165,11 +59,16 @@
   function renderLog() {
     const logList = document.getElementById('log');
     logList.innerHTML = '';
+
     if (log.length === 0) {
       logList.innerHTML = '<li>No entries yet.</li>';
       return;
     }
-    log.forEach(entry => {
+
+    // Sort by date (newest first)
+    const sortedLog = [...log].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    sortedLog.forEach(entry => {
       const li = document.createElement('li');
       li.textContent = `${entry.date} — ${entry.exercise} - ${entry.sets} sets x ${entry.reps} reps @ ${entry.weight} kg`;
       logList.appendChild(li);
@@ -177,13 +76,14 @@
   }
 
   function addEntry() {
-    const date = dateInput.value;
+    // If user didn't change the date, default to today
+    const date = dateInput.value || new Date().toISOString().split('T')[0];
     const exercise = document.getElementById('exercise').value;
     const sets = parseInt(document.getElementById('sets').value);
     const reps = parseInt(document.getElementById('reps').value);
     const weight = parseFloat(document.getElementById('weight').value);
 
-    if (!date || !exercise || isNaN(sets) || sets <= 0 || isNaN(reps) || reps <= 0 || isNaN(weight) || weight < 0) {
+    if (!exercise || isNaN(sets) || sets <= 0 || isNaN(reps) || reps <= 0 || isNaN(weight) || weight < 0) {
       alert('Please fill out all fields correctly.');
       return;
     }
@@ -203,6 +103,3 @@
 
   renderLog();
 </script>
-
-</body>
-</html>
