@@ -165,11 +165,16 @@
   function renderLog() {
     const logList = document.getElementById('log');
     logList.innerHTML = '';
+
     if (log.length === 0) {
       logList.innerHTML = '<li>No entries yet.</li>';
       return;
     }
-    log.forEach(entry => {
+
+    // Sort by date (newest first)
+    const sortedLog = [...log].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    sortedLog.forEach(entry => {
       const li = document.createElement('li');
       li.textContent = `${entry.date} — ${entry.exercise} - ${entry.sets} sets x ${entry.reps} reps @ ${entry.weight} kg`;
       logList.appendChild(li);
@@ -177,13 +182,13 @@
   }
 
   function addEntry() {
-    const date = dateInput.value;
+    const date = dateInput.value || new Date().toISOString().split('T')[0];
     const exercise = document.getElementById('exercise').value;
     const sets = parseInt(document.getElementById('sets').value);
     const reps = parseInt(document.getElementById('reps').value);
     const weight = parseFloat(document.getElementById('weight').value);
 
-    if (!date || !exercise || isNaN(sets) || sets <= 0 || isNaN(reps) || reps <= 0 || isNaN(weight) || weight < 0) {
+    if (!exercise || isNaN(sets) || sets <= 0 || isNaN(reps) || reps <= 0 || isNaN(weight) || weight < 0) {
       alert('Please fill out all fields correctly.');
       return;
     }
@@ -202,8 +207,8 @@
   }
 
   renderLog();
-
 </script>
+
 
 </body>
 </html>
