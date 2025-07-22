@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Weightlifting Tracker</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 400px; margin: auto; padding: 20px; }
+  label, select, input, button { display: block; margin: 10px 0 5px; width: 100%; box-sizing: border-box; }
+  button { padding: 10px; cursor: pointer; }
+  ul { padding-left: 20px; }
+  li { margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<h2>Weightlifting Tracker</h2>
+
+<label>Date</label>
+<input id="date" type="date" />
+
+<label>Workout Day</label>
+<select id="workoutDay" onchange="updateExercises()">
+  <option value="">Select a day</option>
+  <option value="PUSH">PPL - PUSH</option>
+  <option value="PULL">PPL - PULL</option>
+  <option value="LEGS">PPL - LEGS</option>
+</select>
+
+<label>Exercise</label>
+<select id="exercise">
+  <option value="">Select workout day first</option>
+</select>
+
+<label>Reps</label>
+<input id="reps" type="number" min="1" />
+
+<label>Weight (kg)</label>
+<input id="weight" type="number" min="0" step="0.1" />
+
+<button onclick="addEntry()">Add Entry</button>
+
+<h3>Your Entries</h3>
+<ul id="log"></ul>
+
+<script>
+  const today = new Date().toISOString().split('T')[0];
+  const dateInput = document.getElementById('date');
+  dateInput.value = today;
+
+  const exercisesByDay = {
+    PUSH: [
+      "Benchpress",
+      "Incline benchpress",
+      "Incline benchpress (smith)",
+      "Incline dumbell press",
+      "Tricep extention",
+      "V bar overhead extension",
+      "Single arm tricep extension",
+      "Machine fly",
+      "Cable side raise"
+    ],
+    PULL: [
+      "Deadlift",
+      "Hammer curl",
+      "Preacher curl",
+      "Ez bar curl",
+      "Latt pulldown",
+      "Cable row",
+      "Rear delt extension"
+    ],
+    LEGS: [
+      "Squat",
+      "Hack squat",
+      "Ham curl",
+      "Seated ham curl",
+      "Leg extensions"
+    ]
+  };
+
+  function updateExercises() {
+    const daySelect = document.getElementById('workoutDay');
+    const exerciseSelect = document.getElementById('exercise');
+    const day = daySelect.value;
+
+    exerciseSelect.innerHTML = ''; // Clear previous options
+
+    if (!day) {
+      const option = document.createElement('option');
+      option.text = 'Select workout day first';
+      option.value = '';
+      exerciseSelect.add(option);
+      return;
+    }
+
+    exercisesByDay[day].forEach(exercise => {
+      const option = document.createElement('option');
+      option.text = exercise;
+      option.value = exercise;
+      exerciseSelect.add(option);
+    });
+  }
+
+  let log = JSON.parse(localStorage.getItem('weightliftingLog')) || [];
+
+  function renderLog() {
+    const logList = document.getElementById('log');
+    logList.innerHTML = '';
+    if (log.length === 0) {
+      logList.innerHTML = '<li>No entries yet.</li>';
+      return;
+    }
+    log.forEach(entry => {
+      const li = document.createElement('li');
+      li.textContent = `${entry.date} — ${entry.exercise} - ${entry.reps} reps @ ${entry.weight} kg`;
+      logList.appendChild(li);
+    });
+  }
+
+  function addEntry() {
+    const date = dateInput.value;
+    const exercise = document.getElementById('exercise').value;
+    const reps = parseInt(document.getElementById('reps').value);
+    const weight = parseFloat(document.getElementById('weight').value);
+
+    if (!date || !exercise || isNaN(reps) || reps <= 0 || isNaN(weight) || weight < 0) {
+      alert('Please fill out all fields correctly.');
+      return;
+    }
+
+    log.push({ date, exercise, reps, weight });
+    localStorage.setItem('weightliftingLog', JSON.stringify(log));
+    renderLog();
+
+    // Reset form
+    dateInput.value = today;
+    document.getElementById('workoutDay').value = '';
+    const exerciseSelect = document.getElementById('exercise');
+    exerciseSelect.innerHTML = '<option value="">Select workout day first</option>';
+    document.getElementById('reps').value = '';
+    document.getElementById('weight').value = '';
+  }
+
+  renderLog();
+</script>
+
+</body>
+</html>
