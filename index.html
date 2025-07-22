@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Weightlifting Tracker</title>
-<style>
-  body { font-family: Arial, sans-serif; max-width: 400px; margin: auto; padding: 20px; }
-  label, select, input, button { display: block; margin: 10px 0 5px; width: 100%; box-sizing: border-box; }
-  button { padding: 10px; cursor: pointer; }
-  ul { padding-left: 20px; }
-  li { margin-bottom: 10px; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Weightlifting Tracker</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 400px; margin: auto; padding: 20px; }
+    label, select, input, button { display: block; margin: 10px 0 5px; width: 100%; box-sizing: border-box; }
+    button { padding: 10px; cursor: pointer; }
+    ul { padding-left: 20px; }
+    li { margin-bottom: 10px; }
+  </style>
 </head>
 <body>
 
@@ -31,6 +31,9 @@
 <select id="exercise">
   <option value="">Select workout day first</option>
 </select>
+
+<label>Sets</label>
+<input id="sets" type="number" min="1" />
 
 <label>Reps</label>
 <input id="reps" type="number" min="1" />
@@ -79,11 +82,9 @@
   };
 
   function updateExercises() {
-    const daySelect = document.getElementById('workoutDay');
+    const day = document.getElementById('workoutDay').value;
     const exerciseSelect = document.getElementById('exercise');
-    const day = daySelect.value;
-
-    exerciseSelect.innerHTML = ''; // Clear previous options
+    exerciseSelect.innerHTML = '';
 
     if (!day) {
       const option = document.createElement('option');
@@ -112,7 +113,7 @@
     }
     log.forEach(entry => {
       const li = document.createElement('li');
-      li.textContent = `${entry.date} — ${entry.exercise} - ${entry.reps} reps @ ${entry.weight} kg`;
+      li.textContent = `${entry.date} — ${entry.exercise} - ${entry.sets} sets x ${entry.reps} reps @ ${entry.weight} kg`;
       logList.appendChild(li);
     });
   }
@@ -120,23 +121,24 @@
   function addEntry() {
     const date = dateInput.value;
     const exercise = document.getElementById('exercise').value;
+    const sets = parseInt(document.getElementById('sets').value);
     const reps = parseInt(document.getElementById('reps').value);
     const weight = parseFloat(document.getElementById('weight').value);
 
-    if (!date || !exercise || isNaN(reps) || reps <= 0 || isNaN(weight) || weight < 0) {
+    if (!date || !exercise || isNaN(sets) || sets <= 0 || isNaN(reps) || reps <= 0 || isNaN(weight) || weight < 0) {
       alert('Please fill out all fields correctly.');
       return;
     }
 
-    log.push({ date, exercise, reps, weight });
+    log.push({ date, exercise, sets, reps, weight });
     localStorage.setItem('weightliftingLog', JSON.stringify(log));
     renderLog();
 
     // Reset form
     dateInput.value = today;
     document.getElementById('workoutDay').value = '';
-    const exerciseSelect = document.getElementById('exercise');
-    exerciseSelect.innerHTML = '<option value="">Select workout day first</option>';
+    document.getElementById('exercise').innerHTML = '<option value="">Select workout day first</option>';
+    document.getElementById('sets').value = '';
     document.getElementById('reps').value = '';
     document.getElementById('weight').value = '';
   }
