@@ -102,6 +102,13 @@
 <button onclick="addEntry()">Add Entry</button>
 
 <h3>Your Entries</h3>
+  
+  <label>View By</label>
+<select id="viewMode" onchange="switchView()">
+  <option value="date">📅 Date</option>
+  <option value="exercise">🏋️ Exercise</option>
+</select>
+  
 <ul id="log"></ul>
 
 <script>
@@ -211,7 +218,7 @@
 
     log.push({ date, exercise, sets, reps, weight });
     localStorage.setItem('weightliftingLog', JSON.stringify(log));
-    renderLog();
+    switchView();
 
     // Reset form
     dateInput.value = today;
@@ -222,7 +229,49 @@
     document.getElementById('weight').value = '';
   }
 
+  function switchView() {
+  const view = document.getElementById('viewMode').value;
+  if (view === 'exercise') {
+    renderLogByExercise();
+  } else {
+    renderLog();
+  }
+}
+  
   renderLog();
+  function renderLogByExercise() {
+  const logList = document.getElementById('log');
+  logList.innerHTML = '';
+
+  if (log.length === 0) {
+    logList.innerHTML = '<li>No entries yet.</li>';
+    return;
+  }
+
+  // Group entries by exercise name
+  const grouped = {};
+  log.forEach(entry => {
+    if (!grouped[entry.exercise]) grouped[entry.exercise] = [];
+    grouped[entry.exercise].push(entry);
+  });
+
+  // Sort exercise names alphabetically
+  const sortedExercises = Object.keys(grouped).sort();
+
+  sortedExercises.forEach(exercise => {
+    const header = document.createElement('li');
+    header.innerHTML = `<strong>🏋️ ${exercise}</strong>`;
+    logList.appendChild(header);
+
+    grouped[exercise]
+      .sort((a, b) => new Date(b.date) - new Date(a.date)) // newest first
+      .forEach(entry => {
+        const li = document.createElement('li');
+        li.textContent = `- ${entry.date} — ${entry.sets} sets x ${entry.reps} reps @ ${entry.weight} kg`;
+        logList.appendChild(li);
+      });
+  });
+}
 </script>
 
 
