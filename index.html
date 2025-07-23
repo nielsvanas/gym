@@ -163,23 +163,39 @@
   let log = JSON.parse(localStorage.getItem('weightliftingLog')) || [];
 
   function renderLog() {
-    const logList = document.getElementById('log');
-    logList.innerHTML = '';
+  const logList = document.getElementById('log');
+  logList.innerHTML = '';
 
-    if (log.length === 0) {
-      logList.innerHTML = '<li>No entries yet.</li>';
-      return;
-    }
+  if (log.length === 0) {
+    logList.innerHTML = '<li>No entries yet.</li>';
+    return;
+  }
 
-    // Sort by date (newest first)
-    const sortedLog = [...log].sort((a, b) => new Date(b.date) - new Date(a.date));
+  // Group entries by date
+  const grouped = {};
+  log.forEach(entry => {
+    if (!grouped[entry.date]) grouped[entry.date] = [];
+    grouped[entry.date].push(entry);
+  });
 
-    sortedLog.forEach(entry => {
+  // Sort dates (newest first)
+  const sortedDates = Object.keys(grouped).sort((a, b) => new Date(b) - new Date(a));
+
+  sortedDates.forEach(date => {
+    // Date header
+    const dateHeader = document.createElement('li');
+    dateHeader.innerHTML = `<strong>🗓 ${date}</strong>`;
+    logList.appendChild(dateHeader);
+
+    // Entries for that date
+    grouped[date].forEach(entry => {
       const li = document.createElement('li');
-      li.textContent = `${entry.date} — ${entry.exercise} - ${entry.sets} sets x ${entry.reps} reps @ ${entry.weight} kg`;
+      li.textContent = `- ${entry.exercise} - ${entry.sets} sets x ${entry.reps} reps @ ${entry.weight} kg`;
       logList.appendChild(li);
     });
-  }
+  });
+}
+
 
   function addEntry() {
     const date = dateInput.value || new Date().toISOString().split('T')[0];
